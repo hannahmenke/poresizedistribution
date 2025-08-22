@@ -1,0 +1,302 @@
+# Pore Size Distribution Analysis - .gitignore
+
+# =============================================================================
+# Images and Plots
+# =============================================================================
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.tif
+*.svg
+*.pdf
+
+# Generated plots and visualizations
+*_plot.png
+*_distribution.png
+*_bentheimer.png
+*_results.png
+pore_distribution.*
+distribution_*
+plot_*
+
+# =============================================================================
+# Algorithm Design and Planning Documents
+# =============================================================================
+performance_improvement_plan.md
+progressive_algorithm_design.md
+algorithm_design/
+planning/
+design_docs/
+
+# =============================================================================
+# Data Files
+# =============================================================================
+# Raw data files (often large binary files)
+*.raw
+*.vol
+*.dat
+*.bin
+
+# Processed data
+*.npy
+*.npz
+*.hdf5
+*.h5
+
+# Test data (keep small examples, exclude large datasets)
+*_test_data.*
+*bentheimer*
+*Bentheimer*
+250cubedspherepack.*
+
+# =============================================================================
+# Output Files
+# =============================================================================
+# Results and analysis outputs
+*_sizes.txt
+*_stats.txt
+*_report.txt
+*_performance.txt
+*_timing.txt
+*_analysis.txt
+results/
+output/
+analysis_output/
+
+# Temporary processing files
+*.tmp
+*.temp
+processing_*
+temp_*
+
+# =============================================================================
+# Python
+# =============================================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# PEP 582
+__pypackages__/
+
+# =============================================================================
+# IDEs and Editors
+# =============================================================================
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Spyder
+.spyderproject
+.spyproject
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# =============================================================================
+# Operating System
+# =============================================================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# Environment and Configuration
+# =============================================================================
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Conda
+.conda/
+conda-meta/
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# =============================================================================
+# Logs and Debugging
+# =============================================================================
+*.log
+*.out
+*.err
+logs/
+debug/
+trace/
+profile/
+
+# =============================================================================
+# Benchmarking and Profiling
+# =============================================================================
+benchmark_results/
+profiling_results/
+timing_results/
+*.prof
+*.profile
+
+# =============================================================================
+# Documentation Build
+# =============================================================================
+docs/_build/
+docs/build/
+site/
+
+# =============================================================================
+# Version Control
+# =============================================================================
+.git/
+.gitattributes
+
+# =============================================================================
+# Claude Code Configuration
+# =============================================================================
+.claude/
+CLAUDE.md
+
+# =============================================================================
+# Backup Files
+# =============================================================================
+*.bak
+*.backup
+*.old
+*.orig
+*_backup.*
+*_old.*
+
+# =============================================================================
+# Compressed Files
+# =============================================================================
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# =============================================================================
+# Keep These Files (Override patterns above)
+# =============================================================================
+# Keep essential documentation
+!README.md
+!QUICK_START.md  
+!IMPLEMENTATIONS.md
+
+# Keep small example data if needed
+!examples/small_test_data.*
+
+# Keep configuration files
+!environment.yml
+!requirements.txt
+!setup_env.sh

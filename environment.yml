@@ -1,0 +1,12 @@
+name: poresize-analysis
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy
+  - scipy
+  - scikit-image
+  - matplotlib
+  - joblib
+  - pip
