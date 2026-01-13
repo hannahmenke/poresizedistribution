@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 import argparse
 import sys
 
+from pore_render import render_pores_to_mesh
 def read_raw(filename, shape):
     """
     Reads a .raw file and returns a numpy array with the given shape.
@@ -219,6 +220,10 @@ def parse_arguments():
     parser.add_argument('--pore_value', type=int, default=1, help='The pixel value that represents pores in the binary image (default: 1).')
     parser.add_argument('--log_scale', action='store_true', help='Use logarithmic scale for the histogram plot.')
     parser.add_argument('--min_pore_size', type=float, default=0.0, help='Minimum pore diameter in microns to be considered (default: 0.0, no filtering).')
+    parser.add_argument('--render_output', type=str, default=None, help='Path to save a 3D mesh of separated pores (.ply or .obj).')
+    parser.add_argument('--render_format', type=str, choices=['ply', 'obj'], default=None, help='Mesh format (defaults to render_output extension).')
+    parser.add_argument('--render_max_pores', type=int, default=200, help='Max pores to render by size (0 = all).')
+    parser.add_argument('--render_min_size', type=float, default=None, help='Minimum pore diameter in microns for rendering (defaults to --min_pore_size).')
     return parser.parse_args()
 
 def main():
@@ -234,6 +239,10 @@ def main():
     pore_value = args.pore_value
     log_scale = args.log_scale
     min_pore_size = args.min_pore_size
+    render_output = args.render_output
+    render_format = args.render_format
+    render_max_pores = args.render_max_pores
+    render_min_size = args.render_min_size
     
     if not os.path.isfile(input_file):
         print(f"Error: The input file {input_file} does not exist.")
@@ -248,6 +257,7 @@ def main():
         
         # Step 3: Separate pores and label them using scikit-image
         labeled_pores, num_pores, pore_sizes = separate_pores_skimage(binary_image)
+        pore_sizes_all = np.array(pore_sizes)
         
         print(f"Total number of pores detected: {num_pores}")
         
@@ -256,12 +266,13 @@ def main():
             sys.exit(0)
         
         # Step 4: Filter out small pores if min_pore_size is specified
+        pore_sizes_for_stats = pore_sizes_all
         if min_pore_size > 0.0:
             # Convert min_pore_size from microns to voxels
             min_pore_size_voxels = min_pore_size / voxel_size
             min_pore_size_voxels = max(1, int(np.ceil(min_pore_size_voxels)))  # Ensure at least 1 voxel
-            pore_sizes, num_filtered = filter_pore_sizes(pore_sizes, min_pore_size_voxels)
-            num_pores = len(pore_sizes)
+            pore_sizes_for_stats, num_filtered = filter_pore_sizes(pore_sizes_all, min_pore_size_voxels)
+            num_pores = len(pore_sizes_for_stats)
             print(f"Number of pores after filtering: {num_pores}")
             print(f"Number of pores filtered out: {num_filtered}")
             
@@ -273,14 +284,33 @@ def main():
         
         # Step 5: Plot pore size distribution and calculate statistics
         mean_diameter, median_diameter = plot_pore_size_distribution(
-            pore_sizes, voxel_size=voxel_size, bins=bins, output_path=output_plot, log_scale=log_scale
+            pore_sizes_for_stats, voxel_size=voxel_size, bins=bins, output_path=output_plot, log_scale=log_scale
         )
         
         # Step 6: Save pore sizes and statistics if requested
         if output_sizes:
-            save_pore_sizes(pore_sizes, output_sizes)
+            save_pore_sizes(pore_sizes_for_stats, output_sizes)
         if output_stats:
             save_statistics(mean_diameter, median_diameter, output_stats)
+
+        if render_output:
+            render_min_size_value = min_pore_size if render_min_size is None else render_min_size
+            pores_rendered, vertex_count, face_count, mesh_format = render_pores_to_mesh(
+                labeled_pores,
+                pore_sizes_all,
+                voxel_size,
+                render_output,
+                render_format=render_format,
+                min_diameter_microns=render_min_size_value,
+                max_pores=render_max_pores,
+            )
+            if pores_rendered == 0:
+                print("No pores met the rendering criteria; skipping mesh output.")
+            else:
+                print(
+                    f"Saved {mesh_format} mesh to {render_output} "
+                    f"({pores_rendered} pores, {vertex_count} vertices, {face_count} faces)."
+                )
         
         print("Processing completed successfully.")
     

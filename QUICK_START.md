@@ -56,6 +56,8 @@ python PoreSizeDistPar.py \
 --min_pore_size 20            # Minimum pore diameter in microns
 --output_plot results.png     # Save plot (optional)
 --output_stats results.txt    # Save statistics (optional)
+--render_output pores.ply     # Save 3D mesh of separated pores (optional)
+--render_max_pores 200        # Limit pores in render (0 = all)
 --log_scale                   # Use log scale for plot (optional)
 ```
 

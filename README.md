@@ -47,6 +47,29 @@ python PoreSizeDistPar.py \
     --output_stats pore_stats.txt
 ```
 
+### 3D Mesh Rendering (Optional)
+
+```bash
+# Export separated pores as a 3D mesh (PLY or OBJ)
+python PoreSizeDistPar.py \
+    --input your_data.raw \
+    --shape 400 400 400 \
+    --voxel_size 5.0 \
+    --pore_value 0 \
+    --render_output pores.ply \
+    --render_max_pores 200
+```
+
+### View In ParaView
+
+1. Open ParaView.
+2. File → Open… → select the exported `.ply` or `.obj`.
+3. Click Apply in the Properties panel.
+4. Set Representation to `Surface` (or `Surface With Edges`).
+5. If colors are missing, set Coloring to `RGB`.
+
+If the mesh is heavy, use Filters → `Quadric Decimation` to reduce triangles.
+
 ## 📁 Implementation Details
 
 ### **PoreSizeDist.py** - Original Reference
