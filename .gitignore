@@ -12,6 +12,7 @@
 *.tif
 *.svg
 *.pdf
+*.ply
 
 # Generated plots and visualizations
 *_plot.png
