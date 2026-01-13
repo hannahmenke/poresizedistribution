@@ -23,24 +23,49 @@ import os
 import sys
 
 from pore_render import render_pores_to_mesh
-def read_raw(filename, shape):
+def read_raw(filename, shape, subvolume_start=None, subvolume_size=None):
     """
     Reads a .raw file and returns a numpy array with the given shape.
     
     Parameters:
         filename (str): Path to the .raw file.
         shape (tuple): Dimensions of the 3D image (depth, height, width).
+        subvolume_start (tuple): Optional (z, y, x) start indices for a subvolume.
+        subvolume_size (tuple): Optional (dz, dy, dx) size for a subvolume.
     
     Returns:
         np.ndarray: 3D numpy array representing the binary image.
     """
     print(f"Reading .raw file: {filename} with shape {shape}")
-    data = np.fromfile(filename, dtype=np.uint8)
-    expected_size = np.prod(shape)
-    if data.size != expected_size:
-        raise ValueError(f"Data size {data.size} does not match expected shape {shape} (requires {expected_size} elements).")
-    image = data.reshape(shape)
-    return image
+    expected_size = int(np.prod(shape))
+    actual_size = os.path.getsize(filename)
+    if actual_size != expected_size:
+        raise ValueError(
+            f"File size {actual_size} bytes does not match expected shape {shape} "
+            f"(requires {expected_size} bytes for uint8)."
+        )
+
+    if subvolume_start is None and subvolume_size is None:
+        data = np.fromfile(filename, dtype=np.uint8)
+        image = data.reshape(shape)
+        return image
+
+    if subvolume_start is None or subvolume_size is None:
+        raise ValueError("Both subvolume_start and subvolume_size must be provided together.")
+
+    z0, y0, x0 = subvolume_start
+    dz, dy, dx = subvolume_size
+    if any(v < 0 for v in (z0, y0, x0, dz, dy, dx)):
+        raise ValueError("Subvolume indices and sizes must be non-negative.")
+    z1, y1, x1 = z0 + dz, y0 + dy, x0 + dx
+    if z1 > shape[0] or y1 > shape[1] or x1 > shape[2]:
+        raise ValueError("Subvolume exceeds full image bounds.")
+
+    volume = np.memmap(filename, dtype=np.uint8, mode='r', shape=shape)
+    subvolume = np.array(volume[z0:z1, y0:y1, x0:x1], copy=True)
+    del volume
+    print(f"Loaded subvolume start={subvolume_start} size={subvolume_size} -> shape {subvolume.shape}")
+    return subvolume
 
 def binarize_image(image, pore_value):
     """
@@ -212,7 +237,7 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser(description='Process a 3D binary .raw image to separate pores and generate pore size distribution with statistical analysis.')
     parser.add_argument('--input', type=str, required=True, help='Path to the input .raw file.')
-    parser.add_argument('--shape', type=int, nargs=3, required=True, metavar=('DEPTH', 'HEIGHT', 'WIDTH'), help='Dimensions of the 3D image.')
+    parser.add_argument('--shape', type=int, nargs=3, required=True, metavar=('DEPTH', 'HEIGHT', 'WIDTH'), help='Dimensions of the full 3D image.')
     parser.add_argument('--voxel_size', type=float, default=1.0, help='Size of a voxel in microns (default: 1.0).')
     parser.add_argument('--bins', type=int, default=50, help='Number of bins for the histogram (default: 50).')
     parser.add_argument('--output_plot', type=str, default=None, help='Path to save the pore size distribution plot (e.g., "pore_distribution.png"). If not provided, the plot will be displayed.')
@@ -225,6 +250,9 @@ def parse_arguments():
     parser.add_argument('--render_format', type=str, choices=['ply', 'obj'], default=None, help='Mesh format (defaults to render_output extension).')
     parser.add_argument('--render_max_pores', type=int, default=200, help='Max pores to render by size (0 = all).')
     parser.add_argument('--render_min_size', type=float, default=None, help='Minimum pore diameter in microns for rendering (defaults to --min_pore_size).')
+    parser.add_argument('--render_max_size', type=float, default=None, help='Maximum pore diameter in microns for rendering.')
+    parser.add_argument('--subvolume_start', type=int, nargs=3, metavar=('Z', 'Y', 'X'), help='Start indices for subvolume (z y x).')
+    parser.add_argument('--subvolume_size', type=int, nargs=3, metavar=('DZ', 'DY', 'DX'), help='Size of subvolume (dz dy dx).')
     return parser.parse_args()
 
 def main():
@@ -244,6 +272,9 @@ def main():
     render_format = args.render_format
     render_max_pores = args.render_max_pores
     render_min_size = args.render_min_size
+    render_max_size = args.render_max_size
+    subvolume_start = tuple(args.subvolume_start) if args.subvolume_start else None
+    subvolume_size = tuple(args.subvolume_size) if args.subvolume_size else None
     
     if not os.path.isfile(input_file):
         print(f"Error: The input file {input_file} does not exist.")
@@ -251,7 +282,7 @@ def main():
     
     try:
         # Step 1: Read the .raw file
-        image = read_raw(input_file, shape)
+        image = read_raw(input_file, shape, subvolume_start=subvolume_start, subvolume_size=subvolume_size)
         
         # Step 2: Binarize the image based on pore_value
         binary_image = binarize_image(image, pore_value)
@@ -305,6 +336,7 @@ def main():
                 render_output,
                 render_format=render_format,
                 min_diameter_microns=render_min_size_value,
+                max_diameter_microns=render_max_size,
                 max_pores=render_max_pores,
             )
             if pores_rendered == 0:

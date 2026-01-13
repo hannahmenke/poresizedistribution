@@ -15,15 +15,22 @@ def _infer_format(output_path, render_format):
     return "ply"
 
 
-def select_pore_labels(pore_sizes, voxel_size, min_diameter_microns, max_pores):
+def select_pore_labels(
+    pore_sizes,
+    voxel_size,
+    min_diameter_microns,
+    max_diameter_microns,
+    max_pores,
+):
     pore_sizes = np.asarray(pore_sizes, dtype=np.float64)
     pore_volumes = pore_sizes * (voxel_size ** 3)
     pore_diameters = (6 * pore_volumes / np.pi) ** (1.0 / 3.0)
 
+    valid_mask = np.ones_like(pore_diameters, dtype=bool)
     if min_diameter_microns and min_diameter_microns > 0:
-        valid_mask = pore_diameters >= min_diameter_microns
-    else:
-        valid_mask = np.ones_like(pore_diameters, dtype=bool)
+        valid_mask &= pore_diameters >= min_diameter_microns
+    if max_diameter_microns and max_diameter_microns > 0:
+        valid_mask &= pore_diameters <= max_diameter_microns
 
     candidate_idx = np.where(valid_mask)[0]
     if candidate_idx.size == 0:
@@ -154,11 +161,16 @@ def render_pores_to_mesh(
     output_path,
     render_format=None,
     min_diameter_microns=0.0,
+    max_diameter_microns=None,
     max_pores=0,
 ):
     mesh_format = _infer_format(output_path, render_format)
     label_ids, _, _ = select_pore_labels(
-        pore_sizes, voxel_size, min_diameter_microns, max_pores
+        pore_sizes,
+        voxel_size,
+        min_diameter_microns,
+        max_diameter_microns,
+        max_pores,
     )
     if label_ids.size == 0:
         return 0, 0, 0, None

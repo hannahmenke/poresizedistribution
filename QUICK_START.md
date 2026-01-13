@@ -58,6 +58,10 @@ python PoreSizeDistPar.py \
 --output_stats results.txt    # Save statistics (optional)
 --render_output pores.ply     # Save 3D mesh of separated pores (optional)
 --render_max_pores 200        # Limit pores in render (0 = all)
+--render_min_size 50          # Min pore diameter for render (microns)
+--render_max_size 500         # Max pore diameter for render (microns)
+--subvolume_start 0 0 0       # Optional subvolume start (z y x)
+--subvolume_size 200 400 400  # Optional subvolume size (dz dy dx)
 --log_scale                   # Use log scale for plot (optional)
 ```
 

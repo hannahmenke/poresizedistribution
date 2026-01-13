@@ -60,6 +60,21 @@ python PoreSizeDistPar.py \
     --render_max_pores 200
 ```
 
+Optional render filters:
+- `--render_min_size` / `--render_max_size` to cap pore diameters (microns)
+
+### Subvolume Processing (Optional)
+
+```bash
+# Process only a subvolume (z y x start, dz dy dx size)
+python PoreSizeDistPar.py \
+    --input your_data.raw \
+    --shape 400 400 400 \
+    --subvolume_start 50 100 100 \
+    --subvolume_size 100 200 200 \
+    --pore_value 0
+```
+
 ### View In ParaView
 
 1. Open ParaView.
@@ -68,7 +83,7 @@ python PoreSizeDistPar.py \
 4. Set Representation to `Surface` (or `Surface With Edges`).
 5. If colors are missing, set Coloring to `RGB`.
 
-If the mesh is heavy, use Filters → `Quadric Decimation` to reduce triangles.
+If the mesh is heavy, use Filters → `Decimate` to reduce triangles.
 
 ## 📁 Implementation Details
 
