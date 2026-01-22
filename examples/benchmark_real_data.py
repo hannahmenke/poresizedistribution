@@ -77,27 +77,26 @@ def benchmark_real_data(script_name, extra_args=None):
         return None
 
 def main():
-    # Change to the correct directory
-    os.chdir("/Users/hm114/Library/Mobile Documents/com~apple~CloudDocs/Python/PythonScriptsImages/poresizedistribution")
-    
     # Check if Bentheimer dataset exists
     if not os.path.isfile("Bentheimer400-5mum.raw"):
         print("❌ Bentheimer400-5mum.raw not found!")
+        print("Place your Bentheimer dataset in the current directory and re-run.")
         return
-    
+
     print("🧪 REAL-WORLD PERFORMANCE BENCHMARK")
     print("Dataset: Bentheimer sandstone 400³ voxels @ 5µm resolution")
     print("Size: 64M voxels, ~61MB file")
     print("Expected: Large number of complex pores")
-    
+
     results = {}
-    
+
     # Test each version
     versions = [
         ("PoreSizeDist.py", "Original Sequential", []),
-        ("PoreSizeDistPar.py", "Phase 1 (Fixed Parallel)", []),  
-        ("PoreSizeDistOptimized.py", "Phase 3 (Optimized)", []),
-        ("PoreSizeDistChunkedFixed.py", "Phase 2 (Fixed Chunked)", ["--max_workers", "4"])
+        ("PoreSizeDistPar.py", "Fixed Parallel (Recommended)", []),
+        ("PoreSizeDistGPU.py", "GPU Accelerated", []),
+        ("PoreSizeDistGraph.py", "Graph-Based (Most Accurate)", ["--max_workers", "4"]),
+        ("PoreSizeDistOptimized.py", "Adaptive Optimized", [])
     ]
     
     for script, name, extra_args in versions:

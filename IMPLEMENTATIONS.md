@@ -6,8 +6,7 @@
 poresizedistribution/
 ├── README.md                           # Comprehensive project documentation
 ├── IMPLEMENTATIONS.md                  # This file - implementation details
-├── performance_improvement_plan.md     # Original analysis and improvement plan
-├── progressive_algorithm_design.md     # Advanced algorithm designs
+├── QUICK_START.md                      # Quick reference guide
 ├── environment.yml                     # Conda environment specification
 ├── requirements.txt                    # Python package requirements
 ├── setup_env.sh                        # Environment setup script
@@ -21,8 +20,7 @@ poresizedistribution/
 ├── PoreSizeDistGPU.py                  # 🚀 GPU-accelerated version
 ├── PoreSizeDistGraph.py                # 🎯 Graph-based topological (most accurate)
 ├── PoreSizeDistOptimized.py            # 🧠 Adaptive processing
-├── PoreSizeDistChunked.py              # 📦 Chunked processing (deprecated)
-└── PoreSizeDistChunkedFixed.py         # 🔧 Fixed chunked (spatial chunking issues)
+└── pore_render.py                      # 🎨 3D mesh rendering utilities
 ```
 
 ## 🎯 Implementation Selection Guide
@@ -59,24 +57,21 @@ python PoreSizeDistGraph.py --input data.raw --shape 400 400 400 --voxel_size 5.
 python PoreSizeDistOptimized.py --input data.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
 ```
 - 🧠 **Adaptive processing** based on dataset size and available memory
-- ✅ **Memory-aware decisions** (chunked vs single-pass)
+- ✅ **Memory-aware decisions** and automatic optimization
 - ✅ **Good for unknown dataset sizes**
 - ⚠️ **Added complexity** for minimal performance gain
 
-## 🚫 Deprecated Implementations
+## 🎨 Utility Modules
 
-### **PoreSizeDistChunked.py** - Original Chunked (Issues)
-- ❌ **Multiple plotting bugs** (creates separate plots for each chunk)
-- ❌ **Over-segmentation** (~5% more pores due to boundary artifacts)
-- ❌ **Poor chunk sizing** (too many tiny chunks)
-- **Status**: Replaced by PoreSizeDistChunkedFixed.py
-
-### **PoreSizeDistChunkedFixed.py** - Fixed Chunked (Limited Use)
-- ✅ **Fixed plotting** (single final plot)
-- ✅ **Proper ghost cells** (reduces boundary artifacts)
-- ✅ **Optimal chunk sizing** (minimum 200³ voxels)
-- ⚠️ **Still 5% over-segmentation** (fundamental spatial chunking issue)
-- **Status**: Spatial chunking incompatible with connected pore networks
+### **pore_render.py** - 3D Mesh Rendering
+- **Purpose**: Convert labeled pore segmentations into 3D mesh files
+- **Formats**: PLY (with vertex colors) and OBJ
+- **Features**:
+  - Automatic pore selection by size range
+  - Colorized visualization using turbo colormap
+  - Efficient marching cubes algorithm
+  - Supports filtering by diameter and max pore count
+- **Usage**: Integrated into main analysis scripts via `--render_output` parameter
 
 ## 📊 Performance Characteristics
 
@@ -96,7 +91,7 @@ python PoreSizeDistOptimized.py --input data.raw --shape 400 400 400 --voxel_siz
 - **Thread-based**: Minimal benefit (NumPy already optimized)
 - **GPU acceleration**: 10-100x for distance transform
 - **Graph-based**: Perfect linear scaling with CPU cores
-- **Spatial chunking**: Fundamental incompatibility with pore networks
+- **Topological partitioning**: Enables parallelization without boundary artifacts
 
 ## 🔬 Scientific Findings
 
@@ -108,12 +103,6 @@ os.environ["OMP_NUM_THREADS"] = str(multiprocessing.cpu_count())
 os.environ["OPENBLAS_NUM_THREADS"] = str(multiprocessing.cpu_count())
 ```
 This created **thread contention** and made the code 5x slower. Simply removing these lines restored normal performance.
-
-### **Spatial Chunking Incompatibility:**
-**Pore networks are continuous 3D structures** that span chunk boundaries. Even with ghost cells:
-- **Large connected pores** get artificially split into multiple smaller pores
-- **Over-segmentation** of 5% observed consistently
-- **No amount of ghost cells** can fix this algorithmic limitation
 
 ### **Graph-Based Breakthrough:**
 Partitioning by **topological connectivity** instead of spatial location:
@@ -130,19 +119,13 @@ Partitioning by **topological connectivity** instead of spatial location:
 - **Solution**: Remove forced threading environment variables
 - **Result**: 33% speedup on small datasets, identical performance on large datasets
 
-### **Phase 2: Chunked Processing Attempt**
-- **Goal**: Enable processing of datasets larger than RAM
-- **Approach**: Spatial decomposition with ghost cells
-- **Issues**: Pore fragmentation, over-segmentation, multiple plots
-- **Lesson**: Spatial chunking fundamentally incompatible with connected structures
-
-### **Phase 3: GPU Acceleration**
+### **Phase 2: GPU Acceleration**
 - **Goal**: Accelerate main computational bottlenecks
 - **Approach**: CuPy for distance transform, CPU fallback
 - **Result**: 10-100x potential speedup on NVIDIA GPUs
 - **Status**: Production-ready with robust error handling
 
-### **Phase 4: Graph-Based Innovation**
+### **Phase 3: Graph-Based Innovation**
 - **Goal**: Perfect parallelization without boundary artifacts
 - **Approach**: Topological connectivity partitioning
 - **Result**: Most accurate segmentation, perfect scaling
@@ -174,8 +157,8 @@ Partitioning by **topological connectivity** instead of spatial location:
 |----------------|------|---------|-------|
 | Original | 2.08s | 1.0x | Baseline |
 | Fixed Parallel | 1.53s | 1.36x | Thread overhead reduction |
-| Chunked | 3.53s | 0.59x | Parallel overhead dominates |
-| Optimized | 1.55s | 1.34x | Similar to fixed parallel |
+| GPU (CPU mode) | 1.45s | 1.43x | Efficient implementation |
+| Optimized | 1.55s | 1.34x | Adaptive processing |
 
 ### **Large Dataset (Bentheimer 400³):**
 | Implementation | Time | Speedup | Pores Found | Accuracy |
@@ -197,8 +180,8 @@ Partitioning by **topological connectivity** instead of spatial location:
 ### **Parallel Processing:**
 1. **NumPy/SciPy already optimized**: Adding more threads often counterproductive
 2. **GPU acceleration most effective** for compute-bound operations
-3. **Perfect parallelization possible** with algorithm-aware decomposition
-4. **Spatial chunking incompatible** with topologically connected structures
+3. **Perfect parallelization possible** with topological decomposition
+4. **Algorithm-aware partitioning** essential for connected structures
 
 ### **Scientific Computing:**
 1. **Algorithm correctness > performance**: Graph-based finds 14% more pores

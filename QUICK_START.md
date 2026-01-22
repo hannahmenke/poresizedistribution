@@ -86,9 +86,8 @@ python benchmark_real_data.py          # Full Bentheimer test
 ## 📚 Full Documentation
 
 - **README.md**: Comprehensive overview and usage guide
-- **IMPLEMENTATIONS.md**: Detailed technical implementation guide  
-- **performance_improvement_plan.md**: Original analysis and findings
-- **progressive_algorithm_design.md**: Advanced algorithm designs
+- **IMPLEMENTATIONS.md**: Detailed technical implementation guide
+- **QUICK_START.md**: This file - quick reference guide
 
 ## 🏆 Success Story
 

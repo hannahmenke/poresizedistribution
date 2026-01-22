@@ -70,49 +70,6 @@ def benchmark_script(script_name, input_file, shape, runs=3):
     
     return avg_time, std_time
 
-def benchmark_script_chunked(script_name, input_file, shape, runs=3):
-    """Benchmark the chunked version with specific parameters"""
-    times = []
-    
-    for i in range(runs):
-        print(f"Running {script_name} - attempt {i+1}/{runs}...")
-        
-        cmd = [
-            sys.executable, script_name,
-            "--input", input_file,
-            "--shape", str(shape[0]), str(shape[1]), str(shape[2]),
-            "--voxel_size", "1.0",
-            "--bins", "20",
-            "--pore_value", "0",
-            "--min_pore_size", "5",
-            "--chunk_size", "32", "32", "32",  # Smaller chunks for test data
-            "--overlap", "4",
-            "--max_workers", "4"
-        ]
-        
-        start_time = time.time()
-        try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-            end_time = time.time()
-            
-            if result.returncode != 0:
-                print(f"Error running {script_name}:")
-                print(result.stderr)
-                return None
-            
-            execution_time = end_time - start_time
-            times.append(execution_time)
-            print(f"Execution time: {execution_time:.2f} seconds")
-            
-        except subprocess.TimeoutExpired:
-            print(f"Timeout running {script_name}")
-            return None
-    
-    avg_time = np.mean(times)
-    std_time = np.std(times)
-    print(f"Average time for {script_name}: {avg_time:.2f} ± {std_time:.2f} seconds")
-    
-    return avg_time, std_time
 
 def main():
     # Test parameters
@@ -123,51 +80,51 @@ def main():
     
     try:
         print("\n" + "="*60)
-        print("PERFORMANCE BENCHMARK - ALL OPTIMIZATION PHASES")
+        print("PERFORMANCE BENCHMARK - ALL IMPLEMENTATIONS")
         print("="*60)
-        
+
         # Test original version
         print("\nTesting original version (PoreSizeDist.py)...")
         original_time = benchmark_script("PoreSizeDist.py", test_file, test_shape)
-        
-        # Test Phase 1 improved version
-        print("\nTesting Phase 1 improved version (PoreSizeDistPar.py)...")
-        phase1_time = benchmark_script("PoreSizeDistPar.py", test_file, test_shape)
-        
-        # Test Phase 2 chunked version
-        print("\nTesting Phase 2 chunked version (PoreSizeDistChunked.py)...")
-        phase2_time = benchmark_script_chunked("PoreSizeDistChunked.py", test_file, test_shape)
-        
-        # Test Phase 3 optimized version
-        print("\nTesting Phase 3 optimized version (PoreSizeDistOptimized.py)...")
-        phase3_time = benchmark_script("PoreSizeDistOptimized.py", test_file, test_shape)
-        
+
+        # Test fixed parallel version
+        print("\nTesting fixed parallel version (PoreSizeDistPar.py)...")
+        parallel_time = benchmark_script("PoreSizeDistPar.py", test_file, test_shape)
+
+        # Test GPU version (will use CPU fallback if no GPU)
+        print("\nTesting GPU version (PoreSizeDistGPU.py)...")
+        gpu_time = benchmark_script("PoreSizeDistGPU.py", test_file, test_shape)
+
+        # Test optimized version
+        print("\nTesting optimized version (PoreSizeDistOptimized.py)...")
+        optimized_time = benchmark_script("PoreSizeDistOptimized.py", test_file, test_shape)
+
         # Compare results
-        if original_time and phase1_time and phase2_time and phase3_time:
+        if original_time and parallel_time and gpu_time and optimized_time:
             print("\n" + "="*50)
             print("RESULTS COMPARISON")
             print("="*50)
             print(f"Original version:     {original_time[0]:.2f} ± {original_time[1]:.2f} seconds")
-            print(f"Phase 1 (fixed):      {phase1_time[0]:.2f} ± {phase1_time[1]:.2f} seconds")
-            print(f"Phase 2 (chunked):    {phase2_time[0]:.2f} ± {phase2_time[1]:.2f} seconds")
-            print(f"Phase 3 (optimized):  {phase3_time[0]:.2f} ± {phase3_time[1]:.2f} seconds")
-            
-            speedup1 = original_time[0] / phase1_time[0]
-            speedup2 = original_time[0] / phase2_time[0]
-            speedup3 = original_time[0] / phase3_time[0]
-            
+            print(f"Parallel version:     {parallel_time[0]:.2f} ± {parallel_time[1]:.2f} seconds")
+            print(f"GPU version:          {gpu_time[0]:.2f} ± {gpu_time[1]:.2f} seconds")
+            print(f"Optimized version:    {optimized_time[0]:.2f} ± {optimized_time[1]:.2f} seconds")
+
+            speedup_parallel = original_time[0] / parallel_time[0]
+            speedup_gpu = original_time[0] / gpu_time[0]
+            speedup_optimized = original_time[0] / optimized_time[0]
+
             print(f"\nSpeedups vs Original:")
-            print(f"Phase 1: {speedup1:.2f}x {'FASTER' if speedup1 > 1 else 'SLOWER'}")
-            print(f"Phase 2: {speedup2:.2f}x {'FASTER' if speedup2 > 1 else 'SLOWER'}")
-            print(f"Phase 3: {speedup3:.2f}x {'FASTER' if speedup3 > 1 else 'SLOWER'}")
-            
-            best_time = min(original_time[0], phase1_time[0], phase2_time[0], phase3_time[0])
-            if best_time == phase3_time[0]:
-                print(f"\n🏆 BEST: Phase 3 (optimized) - {speedup3:.2f}x faster than original")
-            elif best_time == phase1_time[0]:
-                print(f"\n🏆 BEST: Phase 1 (fixed) - {speedup1:.2f}x faster than original")
-            elif best_time == phase2_time[0]:
-                print(f"\n🏆 BEST: Phase 2 (chunked) - {speedup2:.2f}x faster than original")
+            print(f"Parallel:  {speedup_parallel:.2f}x {'FASTER' if speedup_parallel > 1 else 'SLOWER'}")
+            print(f"GPU:       {speedup_gpu:.2f}x {'FASTER' if speedup_gpu > 1 else 'SLOWER'}")
+            print(f"Optimized: {speedup_optimized:.2f}x {'FASTER' if speedup_optimized > 1 else 'SLOWER'}")
+
+            best_time = min(original_time[0], parallel_time[0], gpu_time[0], optimized_time[0])
+            if best_time == optimized_time[0]:
+                print(f"\n🏆 BEST: Optimized version - {speedup_optimized:.2f}x faster than original")
+            elif best_time == parallel_time[0]:
+                print(f"\n🏆 BEST: Parallel version - {speedup_parallel:.2f}x faster than original")
+            elif best_time == gpu_time[0]:
+                print(f"\n🏆 BEST: GPU version - {speedup_gpu:.2f}x faster than original")
         
     finally:
         # Cleanup
