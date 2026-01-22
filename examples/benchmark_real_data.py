@@ -92,11 +92,11 @@ def main():
 
     # Test each version
     versions = [
-        ("PoreSizeDist.py", "Original Sequential", []),
-        ("PoreSizeDistPar.py", "Fixed Parallel (Recommended)", []),
-        ("PoreSizeDistGPU.py", "GPU Accelerated", []),
-        ("PoreSizeDistGraph.py", "Graph-Based (Most Accurate)", ["--max_workers", "4"]),
-        ("PoreSizeDistOptimized.py", "Adaptive Optimized", [])
+        ("../src/PoreSizeDist.py", "Original Sequential", []),
+        ("../src/PoreSizeDistPar.py", "Fixed Parallel (Recommended)", []),
+        ("../src/PoreSizeDistGPU.py", "GPU Accelerated", []),
+        ("../src/PoreSizeDistGraph.py", "Graph-Based (Most Accurate)", ["--max_workers", "4"]),
+        ("../src/PoreSizeDistOptimized.py", "Adaptive Optimized", [])
     ]
     
     for script, name, extra_args in versions:

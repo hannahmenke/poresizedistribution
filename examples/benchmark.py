@@ -85,19 +85,19 @@ def main():
 
         # Test original version
         print("\nTesting original version (PoreSizeDist.py)...")
-        original_time = benchmark_script("PoreSizeDist.py", test_file, test_shape)
+        original_time = benchmark_script("../src/PoreSizeDist.py", test_file, test_shape)
 
         # Test fixed parallel version
         print("\nTesting fixed parallel version (PoreSizeDistPar.py)...")
-        parallel_time = benchmark_script("PoreSizeDistPar.py", test_file, test_shape)
+        parallel_time = benchmark_script("../src/PoreSizeDistPar.py", test_file, test_shape)
 
         # Test GPU version (will use CPU fallback if no GPU)
         print("\nTesting GPU version (PoreSizeDistGPU.py)...")
-        gpu_time = benchmark_script("PoreSizeDistGPU.py", test_file, test_shape)
+        gpu_time = benchmark_script("../src/PoreSizeDistGPU.py", test_file, test_shape)
 
         # Test optimized version
         print("\nTesting optimized version (PoreSizeDistOptimized.py)...")
-        optimized_time = benchmark_script("PoreSizeDistOptimized.py", test_file, test_shape)
+        optimized_time = benchmark_script("../src/PoreSizeDistOptimized.py", test_file, test_shape)
 
         # Compare results
         if original_time and parallel_time and gpu_time and optimized_time:

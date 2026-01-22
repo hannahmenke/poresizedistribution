@@ -65,6 +65,8 @@ design_docs/
 *_analysis.txt
 results/
 output/
+outputs/*
+!outputs/README.md
 analysis_output/
 
 # Temporary processing files
