@@ -36,6 +36,8 @@ design_docs/
 # Data Files
 # =============================================================================
 # Raw data files (often large binary files)
+data/*
+!data/README.md
 *.raw
 *.vol
 *.dat

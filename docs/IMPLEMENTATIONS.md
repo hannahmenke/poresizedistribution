@@ -7,6 +7,8 @@
 ├── environment.yml
 ├── requirements.txt
 ├── setup_env.sh
+├── data/                        # Input data files (gitignored)
+│   └── README.md
 ├── docs/
 │   ├── IMPLEMENTATIONS.md       # This file
 │   └── QUICK_START.md
@@ -28,22 +30,22 @@
 
 **PoreSizeDistPar.py** - Default choice
 ```bash
-python src/PoreSizeDistPar.py --input data.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
+python src/PoreSizeDistPar.py --input data/sample.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
 ```
 
 **PoreSizeDistGPU.py** - For GPU acceleration
 ```bash
-python src/PoreSizeDistGPU.py --input data.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
+python src/PoreSizeDistGPU.py --input data/sample.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
 ```
 
 **PoreSizeDistGraph.py** - For higher accuracy (slower)
 ```bash
-python src/PoreSizeDistGraph.py --input data.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0 --max_workers 4
+python src/PoreSizeDistGraph.py --input data/sample.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0 --max_workers 4
 ```
 
 **PoreSizeDistOptimized.py** - For automatic optimization
 ```bash
-python src/PoreSizeDistOptimized.py --input data.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
+python src/PoreSizeDistOptimized.py --input data/sample.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
 ```
 
 ## Utilities

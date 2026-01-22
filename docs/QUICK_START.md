@@ -15,7 +15,7 @@ pip install numpy scipy scikit-image matplotlib
 
 ```bash
 python src/PoreSizeDistPar.py \
-    --input your_data.raw \
+    --input data/your_data.raw \
     --shape 400 400 400 \
     --voxel_size 5.0 \
     --bins 100 \

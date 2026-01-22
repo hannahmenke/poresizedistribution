@@ -30,7 +30,7 @@ pip install numpy scipy scikit-image matplotlib
 ```bash
 # Recommended: Fixed parallel version (best performance/simplicity)
 python src/PoreSizeDistPar.py \
-    --input your_data.raw \
+    --input data/your_data.raw \
     --shape 400 400 400 \
     --voxel_size 5.0 \
     --bins 100 \
@@ -46,7 +46,7 @@ python src/PoreSizeDistPar.py \
 ```bash
 # Export separated pores as a 3D mesh (PLY or OBJ)
 python src/PoreSizeDistPar.py \
-    --input your_data.raw \
+    --input data/your_data.raw \
     --shape 400 400 400 \
     --voxel_size 5.0 \
     --pore_value 0 \
@@ -62,7 +62,7 @@ Optional render filters:
 ```bash
 # Process only a subvolume (z y x start, dz dy dx size)
 python src/PoreSizeDistPar.py \
-    --input your_data.raw \
+    --input data/your_data.raw \
     --shape 400 400 400 \
     --subvolume_start 50 100 100 \
     --subvolume_size 100 200 200 \
@@ -85,35 +85,35 @@ If the mesh is heavy, use Filters → `Decimate` to reduce triangles.
 Default choice for most users. Clean, reliable implementation.
 
 ```bash
-python src/PoreSizeDistPar.py --input data.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
+python src/PoreSizeDistPar.py --input data/sample.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
 ```
 
 ### **PoreSizeDistGPU.py**
 Uses GPU acceleration if available, otherwise falls back to CPU. Requires CuPy for GPU support.
 
 ```bash
-python src/PoreSizeDistGPU.py --input data.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
+python src/PoreSizeDistGPU.py --input data/sample.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
 ```
 
 ### **PoreSizeDistGraph.py**
 Uses connectivity analysis for more accurate segmentation. Slower but finds more pores in complex networks.
 
 ```bash
-python src/PoreSizeDistGraph.py --input data.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0 --max_workers 4
+python src/PoreSizeDistGraph.py --input data/sample.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0 --max_workers 4
 ```
 
 ### **PoreSizeDistOptimized.py**
 Automatically adapts processing strategy based on dataset size and available memory.
 
 ```bash
-python src/PoreSizeDistOptimized.py --input data.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
+python src/PoreSizeDistOptimized.py --input data/sample.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
 ```
 
 ### **PoreSizeDist.py**
 Original reference implementation. Use for comparison or educational purposes.
 
 ```bash
-python src/PoreSizeDist.py --input data.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
+python src/PoreSizeDist.py --input data/sample.raw --shape 400 400 400 --voxel_size 5.0 --pore_value 0
 ```
 
 ## Algorithm
@@ -139,7 +139,7 @@ python benchmark_real_data.py          # Real dataset test
 ```bash
 # High-resolution analysis
 python src/PoreSizeDistPar.py \
-    --input high_res_data.raw \
+    --input data/high_res_data.raw \
     --shape 1000 1000 1000 \
     --voxel_size 1.0 \
     --bins 200 \
@@ -150,17 +150,17 @@ python src/PoreSizeDistPar.py \
 
 # Graph-based analysis with custom settings
 python src/PoreSizeDistGraph.py \
-    --input data.raw \
+    --input data/sample.raw \
     --shape 500 500 500 \
     --voxel_size 2.0 \
     --max_workers 8 \
     --output_report outputs/detailed_analysis.txt
 
 # GPU with performance monitoring
-python src/PoreSizeDistGPU.py --input data.raw --output_performance outputs/gpu_timing.txt
+python src/PoreSizeDistGPU.py --input data/sample.raw --output_performance outputs/gpu_timing.txt
 
 # Force CPU mode
-python src/PoreSizeDistGPU.py --input data.raw --force_cpu
+python src/PoreSizeDistGPU.py --input data/sample.raw --force_cpu
 ```
 
 ## Requirements
