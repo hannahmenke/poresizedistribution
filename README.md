@@ -31,7 +31,7 @@ pip install numpy scipy scikit-image matplotlib
 # Recommended: Fixed parallel version (best performance/simplicity)
 python src/PoreSizeDistPar.py \
     --input data/your_data.raw \
-    --shape 400 400 400 \
+    --shape 400 400 400 \           # Z Y X dimensions (depth height width)
     --voxel_size 5.0 \
     --bins 100 \
     --pore_value 0 \
@@ -60,12 +60,13 @@ Optional render filters:
 ### Subvolume Processing (Optional)
 
 ```bash
-# Process only a subvolume (z y x start, dz dy dx size)
+# Process only a subvolume
+# Note: All dimensions follow Z Y X ordering (depth height width)
 python src/PoreSizeDistPar.py \
     --input data/your_data.raw \
-    --shape 400 400 400 \
-    --subvolume_start 50 100 100 \
-    --subvolume_size 100 200 200 \
+    --shape 400 400 400 \           # Z Y X: full volume dimensions
+    --subvolume_start 50 100 100 \  # Z Y X: starting indices
+    --subvolume_size 100 200 200 \  # Z Y X: subvolume size
     --pore_value 0
 ```
 
@@ -80,6 +81,8 @@ python src/PoreSizeDistPar.py \
 If the mesh is heavy, use Filters → `Decimate` to reduce triangles.
 
 ## 📁 Implementation Details
+
+**Note:** All implementations use **Z Y X** dimension ordering (depth, height, width).
 
 ### **PoreSizeDistPar.py** (Recommended)
 Default choice for most users. Clean, reliable implementation.
